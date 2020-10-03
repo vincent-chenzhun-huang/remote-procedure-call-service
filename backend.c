@@ -2,10 +2,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "a1_lib.h"
 #include "message.h"
 #define BUFSIZE  3072
 //
+pid_t pid;
+int rval;
+int n = 10;
+
 int addInts(int a, int b) {
     return a + b;
 }
@@ -68,32 +74,45 @@ int main(void) {
   int sockfd, clientfd;
   char msg[BUFSIZE];
   char response[BUFSIZE];
-  const char *greeting = "hello, world\n";
-  int running = 1;
-  if (create_server("0.0.0.0", 10000, &sockfd) < 0) {
+  if (create_server("127.0.0.1", 4444, &sockfd) < 0) {
     fprintf(stderr, "oh no\n");
     return -1;
   }
+  while(1)  {
+      if (accept_connection(sockfd, &clientfd) < 0) {
+          fprintf(stderr, "oh no\n");
+          return -1;
+      }
+      printf("this is a parent process, client id is %d,\n", clientfd);
+      pid = fork();
+      if(pid == 0) {
+          close(sockfd);
 
-  if (accept_connection(sockfd, &clientfd) < 0) {
-    fprintf(stderr, "oh no\n");
-    return -1;
-  }
+          while (1) {
+              memset(msg, 0, sizeof(msg));
+              ssize_t byte_count = recv_message(clientfd, msg, BUFSIZE);
 
-  while (strcmp(msg, "shutdown\n")) {
-    memset(msg, 0, sizeof(msg));
-    ssize_t byte_count = recv_message(clientfd, msg, BUFSIZE);
-
-    if (byte_count <= 0) {
-      break;
-    }
-    printf("%s\n", msg);
-    struct message *parsed_msg = (struct message *) msg;
-    printf("%s - %d - %d\n", parsed_msg->command, parsed_msg->arg1, parsed_msg->arg2);
-//    process_request(parsed_msg, response);
-//    puts(m->command);
-    process_request(parsed_msg, response);
-    send_message(clientfd, response, sizeof(response));
+              if (byte_count <= 0) {
+                  exit(1);
+              }
+              printf("this is a child process, clientfd is %d\n", clientfd);
+              struct message *parsed_msg = (struct message *) msg;
+              if (strcmp(parsed_msg->command, "shutdown")!=0) {
+                  process_request(parsed_msg, response);
+              } else {
+                  sprintf(response, "shutting down...");
+                  exit(3);
+              }
+              send_message(clientfd, response, sizeof(response));
+          }
+      } else {
+          waitpid(pid, &rval, WNOHANG);
+          sleep(2);
+          if (WEXITSTATUS(rval) == 3) {
+              close(sockfd);
+              exit(0);
+          }
+      }
   }
 
   return 0;
