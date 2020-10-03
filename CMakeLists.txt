@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.10)
 project(remote-procedure-call-service)
 
 set(CMAKE_CXX_STANDARD 14)
