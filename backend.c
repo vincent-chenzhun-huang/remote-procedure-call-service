@@ -8,9 +8,6 @@
 #include "message.h"
 #define BUFSIZE  3072
 //
-pid_t pid;
-int rval;
-int n = 10;
 
 int addInts(int a, int b) {
     return a + b;
@@ -71,6 +68,9 @@ char* process_request(struct message *msg, char *response) {
 
 
 int main(void) {
+    pid_t pid;
+    int rvals[10];
+    int count;
   int sockfd, clientfd;
   char msg[BUFSIZE];
   char response[BUFSIZE];
@@ -79,13 +79,27 @@ int main(void) {
     return -1;
   }
   while(1)  {
+      for (int i = 0; i < 10; i++) {
+          printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
+          if (WEXITSTATUS(rvals[i]) == 3) {
+              printf("Shutdown signal received.\n");
+              exit(0);
+          }
+      }
       if (accept_connection(sockfd, &clientfd) < 0) {
           fprintf(stderr, "oh no\n");
           return -1;
+      } else {
+          printf("accepted connection from client %d\n", clientfd);
       }
-      printf("this is a parent process, client id is %d,\n", clientfd);
-      pid = fork();
-      if(pid == 0) {
+      printf("accepted connection from client %d\n", clientfd);
+      printf("Returned value from child %d %d\n",pid, WEXITSTATUS(rvals[count]));
+//      if (WEXITSTATUS(rval) == 3) {
+//          printf("Shutdown signal received.");
+//          exit(0);
+//      }
+      pid = fork(); // return 0 if in the child process, >0 if it's the parent process, parent will go on to else
+      if(pid == 0) { // in the child process
           close(sockfd);
 
           while (1) {
@@ -95,27 +109,27 @@ int main(void) {
               if (byte_count <= 0) {
                   exit(1);
               }
-              printf("this is a child process, clientfd is %d\n", clientfd);
               struct message *parsed_msg = (struct message *) msg;
-              if (strcmp(parsed_msg->command, "shutdown")!=0) {
+              printf("Command: %s", parsed_msg->command);
+              if (strcmp(parsed_msg->command, "shutdown\n")!=0) {
+                  printf("it's not shutdown, moving on... \n");
                   process_request(parsed_msg, response);
+                  send_message(clientfd, response, sizeof(response));
               } else {
+                  printf("it is a shutdown!!!");
                   sprintf(response, "shutting down...");
+                  send_message(clientfd, response, sizeof(response));
+                  puts("child exited");
                   exit(3);
               }
-              send_message(clientfd, response, sizeof(response));
           }
       } else {
-          waitpid(pid, &rval, WNOHANG);
-          sleep(2);
-          if (WEXITSTATUS(rval) == 3) {
-              close(sockfd);
-              exit(0);
-          }
+              sleep(1);
+              waitpid(pid, &rvals[count], WNOHANG);
+              printf("parent pid = %d\n",pid);
+              count++;
       }
   }
-
-  return 0;
 }
 
 

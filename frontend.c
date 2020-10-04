@@ -42,14 +42,15 @@ int main(void) {
 
         // send the input to server
         int status = send_message(sockfd, (char *) &parsed_msg, sizeof(parsed_msg));
-        if (strcmp(parsed_msg.command, "shutdown\n") == 0) {
-            break;
-        }
         if (status == -1) {
             fprintf(stderr, "error sending the message to backend.");
         }
         // receive a msg from the server
         ssize_t byte_count = recv_message(sockfd, server_msg, sizeof(server_msg));
+        if (strcmp(parsed_msg.command, "shutdown\n") == 0) {
+            printf("Server: %s\n", server_msg);
+            break;
+        }
         if (byte_count <= 0) {
             break;
         }
