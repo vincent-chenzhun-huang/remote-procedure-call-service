@@ -79,18 +79,20 @@ int main(void) {
     return -1;
   }
   while(1)  {
-      for (int i = 0; i < 10; i++) {
-          printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
-          if (WEXITSTATUS(rvals[i]) == 3) {
-              printf("Shutdown signal received.\n");
-              exit(0);
-          }
-      }
       if (accept_connection(sockfd, &clientfd) < 0) {
           fprintf(stderr, "oh no\n");
           return -1;
       } else {
           printf("accepted connection from client %d\n", clientfd);
+      }
+      sleep(2);
+      for (int i = 0; i < 10; i++) {
+          waitpid(pid, &rvals[count], WNOHANG);
+          printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
+          if (WEXITSTATUS(rvals[i]) == 3) {
+              printf("Shutdown signal received.\n");
+              exit(0);
+          }
       }
       printf("accepted connection from client %d\n", clientfd);
       printf("Returned value from child %d %d\n",pid, WEXITSTATUS(rvals[count]));
