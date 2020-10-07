@@ -94,7 +94,6 @@ int main(int argc, char* argv[]) {
         sleep(1);
         for (int i = 0; i < MAX_TIMES_OF_CONNECTIONS; i++) {
             waitpid(pids[i], &rvals[count], WNOHANG);
-            printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
             if (WEXITSTATUS(rvals[i]) == 3) {
                 printf("Shutdown signal received.\n");
                 signal(SIGQUIT, SIG_IGN);
@@ -103,7 +102,6 @@ int main(int argc, char* argv[]) {
             }
         }
         count++;
-        printf("accepted connection from client %d\n", clientfd);
         pids[count] = fork(); // return 0 if in the child process, >0 if it's the parent process, parent will go on to else
         if (pids[count] == 0) { // in the child process
             close(sockfd);
@@ -123,13 +121,11 @@ int main(int argc, char* argv[]) {
                 } else {
                     sprintf(response, "shutting down...");
                     send_message(clientfd, response, sizeof(response));
-                    puts("child exited");
                     exit(3);
                 }
             }
         } else {
             waitpid(pids[count], &rvals[count], WNOHANG);
-            printf("parent pid = %d\n", pids[count]);
             count++;
         }
     }
