@@ -96,8 +96,6 @@ int main(int argc, char* argv[]) {
             waitpid(pids[i], &rvals[count], WNOHANG);
             if (WEXITSTATUS(rvals[i]) == 3) {
                 printf("Shutdown signal received.\n");
-                signal(SIGQUIT, SIG_IGN);
-                kill((getpid()), SIGQUIT); // kill all the child processes
                 exit(0);
             }
         }
