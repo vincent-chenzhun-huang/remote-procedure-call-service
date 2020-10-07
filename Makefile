@@ -131,19 +131,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named frontend
-
-# Build rule for target.
-frontend: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 frontend
-.PHONY : frontend
-
-# fast build rule for target.
-frontend/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/build
-.PHONY : frontend/fast
-
-#=============================================================================
 # Target rules for targets named backend
 
 # Build rule for target.
@@ -156,14 +143,40 @@ backend/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/build
 .PHONY : backend/fast
 
+#=============================================================================
+# Target rules for targets named test
+
+# Build rule for target.
+test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
+.PHONY : test
+
+# fast build rule for target.
+test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
+.PHONY : test/fast
+
+#=============================================================================
+# Target rules for targets named frontend
+
+# Build rule for target.
+frontend: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 frontend
+.PHONY : frontend
+
+# fast build rule for target.
+frontend/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/build
+.PHONY : frontend/fast
+
 a1_lib.o: a1_lib.c.o
 
 .PHONY : a1_lib.o
 
 # target to build an object file
 a1_lib.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/a1_lib.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.o
 .PHONY : a1_lib.c.o
 
 a1_lib.i: a1_lib.c.i
@@ -172,8 +185,8 @@ a1_lib.i: a1_lib.c.i
 
 # target to preprocess a source file
 a1_lib.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/a1_lib.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.i
 .PHONY : a1_lib.c.i
 
 a1_lib.s: a1_lib.c.s
@@ -182,8 +195,8 @@ a1_lib.s: a1_lib.c.s
 
 # target to generate assembly for a file
 a1_lib.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/a1_lib.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/a1_lib.c.s
 .PHONY : a1_lib.c.s
 
 backend.o: backend.c.o
@@ -240,6 +253,66 @@ frontend.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/frontend.c.s
 .PHONY : frontend.c.s
 
+linked_list.o: linked_list.c.o
+
+.PHONY : linked_list.o
+
+# target to build an object file
+linked_list.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/linked_list.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/linked_list.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/linked_list.c.o
+.PHONY : linked_list.c.o
+
+linked_list.i: linked_list.c.i
+
+.PHONY : linked_list.i
+
+# target to preprocess a source file
+linked_list.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/linked_list.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/linked_list.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/linked_list.c.i
+.PHONY : linked_list.c.i
+
+linked_list.s: linked_list.c.s
+
+.PHONY : linked_list.s
+
+# target to generate assembly for a file
+linked_list.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/backend.dir/build.make CMakeFiles/backend.dir/linked_list.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/linked_list.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/frontend.dir/build.make CMakeFiles/frontend.dir/linked_list.c.s
+.PHONY : linked_list.c.s
+
+test.o: test.c.o
+
+.PHONY : test.o
+
+# target to build an object file
+test.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.c.o
+.PHONY : test.c.o
+
+test.i: test.c.i
+
+.PHONY : test.i
+
+# target to preprocess a source file
+test.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.c.i
+.PHONY : test.c.i
+
+test.s: test.c.s
+
+.PHONY : test.s
+
+# target to generate assembly for a file
+test.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/test.c.s
+.PHONY : test.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -250,6 +323,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... backend"
 	@echo "... frontend"
+	@echo "... test"
 	@echo "... a1_lib.o"
 	@echo "... a1_lib.i"
 	@echo "... a1_lib.s"
@@ -259,6 +333,12 @@ help:
 	@echo "... frontend.o"
 	@echo "... frontend.i"
 	@echo "... frontend.s"
+	@echo "... linked_list.o"
+	@echo "... linked_list.i"
+	@echo "... linked_list.s"
+	@echo "... test.o"
+	@echo "... test.i"
+	@echo "... test.s"
 .PHONY : help
 
 
