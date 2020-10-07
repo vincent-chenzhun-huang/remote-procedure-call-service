@@ -7,6 +7,7 @@
 #include "a1_lib.h"
 #include "message.h"
 #define BUFSIZE  3072
+#define MAX_CONNECTIONS 10
 //
 
 int addInts(int a, int b) {
@@ -68,8 +69,8 @@ char* process_request(struct message *msg, char *response) {
 
 
 int main(void) {
-    pid_t pid;
-    int rvals[10];
+    pid_t pids[MAX_CONNECTIONS];
+    int rvals[MAX_CONNECTIONS];
     int count;
   int sockfd, clientfd;
   char msg[BUFSIZE];
@@ -86,22 +87,22 @@ int main(void) {
           printf("accepted connection from client %d\n", clientfd);
       }
       sleep(2);
-      for (int i = 0; i < 10; i++) {
-          waitpid(pid, &rvals[count], WNOHANG);
+      for (int i = 0; i < MAX_CONNECTIONS; i++) {
+          waitpid(pids[i], &rvals[count], WNOHANG);
           printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
           if (WEXITSTATUS(rvals[i]) == 3) {
               printf("Shutdown signal received.\n");
               exit(0);
           }
       }
+      count++;
       printf("accepted connection from client %d\n", clientfd);
-      printf("Returned value from child %d %d\n",pid, WEXITSTATUS(rvals[count]));
 //      if (WEXITSTATUS(rval) == 3) {
 //          printf("Shutdown signal received.");
 //          exit(0);
 //      }
-      pid = fork(); // return 0 if in the child process, >0 if it's the parent process, parent will go on to else
-      if(pid == 0) { // in the child process
+      pids[count] = fork(); // return 0 if in the child process, >0 if it's the parent process, parent will go on to else
+      if(pids[count] == 0) { // in the child process
           close(sockfd);
 
           while (1) {
@@ -127,8 +128,8 @@ int main(void) {
           }
       } else {
               sleep(1);
-              waitpid(pid, &rvals[count], WNOHANG);
-              printf("parent pid = %d\n",pid);
+              waitpid(pids[count], &rvals[count], WNOHANG);
+              printf("parent pid = %d\n",pids[count]);
               count++;
       }
   }
