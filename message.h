@@ -4,7 +4,7 @@
 
 #ifndef REMOTE_PROCEDURE_CALL_SERVICE_MESSAGE_H
 #define REMOTE_PROCEDURE_CALL_SERVICE_MESSAGE_H
-#define BUFSIZE   1024
+#define BUFSIZE   3072
 
 struct message {
     char command[BUFSIZE];
