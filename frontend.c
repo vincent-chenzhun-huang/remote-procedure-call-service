@@ -6,12 +6,16 @@
 
 #define BUFSIZE   3072
 
-int main(void) {
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Invalid number of arguments");
+        exit(1);
+    }
     int sockfd;
     char user_input[BUFSIZE] = {0};
     char server_msg[BUFSIZE] = {0};
 
-    if (connect_to_server("127.0.0.1", 4444, &sockfd) < 0) {
+    if (connect_to_server(argv[1], atoi(argv[2]), &sockfd) < 0) {
         fprintf(stderr, "oh no\n");
         return -1;
     }
@@ -36,7 +40,7 @@ int main(void) {
             token = strtok(NULL, " ");
         }
 
-        if(strcmp(parsed_msg.command, "exit\n") == 0) {
+        if (strcmp(parsed_msg.command, "exit\n") == 0) {
             break;
         }
 
