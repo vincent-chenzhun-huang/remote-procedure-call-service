@@ -71,7 +71,7 @@ char* process_request(struct message *msg, char *response) {
 int main(void) {
     pid_t pids[MAX_TIMES_OF_CONNECTIONS];
     int rvals[MAX_TIMES_OF_CONNECTIONS];
-    int count;
+    int count = 0;
   int sockfd, clientfd;
   char msg[BUFSIZE];
   char response[BUFSIZE];
@@ -106,12 +106,12 @@ int main(void) {
           while (1) {
               memset(msg, 0, sizeof(msg));
               ssize_t byte_count = recv_message(clientfd, msg, BUFSIZE);
-
               if (byte_count <= 0) {
                   exit(1);
               }
               struct message *parsed_msg = (struct message *) msg;
-              printf("Command: %s", parsed_msg->command);
+              printf("Command: %s\n", parsed_msg->command);
+              printf("args: %d %d", parsed_msg->arg1, parsed_msg->arg2);
               if (strcmp(parsed_msg->command, "shutdown\n")!=0) {
                   process_request(parsed_msg, response);
                   send_message(clientfd, response, sizeof(response));
