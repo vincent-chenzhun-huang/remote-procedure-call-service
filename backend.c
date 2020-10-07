@@ -7,7 +7,7 @@
 #include "a1_lib.h"
 #include "message.h"
 #define BUFSIZE  3072
-#define MAX_CONNECTIONS 10
+#define MAX_TIMES_OF_CONNECTIONS 20
 //
 
 int addInts(int a, int b) {
@@ -60,7 +60,7 @@ char* process_request(struct message *msg, char *response) {
     } else if ( strcmp(msg->command, "factorial") == 0 ) {
         sprintf(response, "%lu", factorial(msg->arg1));
     } else {
-        sprintf(response, "Invalid command! %s", msg -> command);
+        sprintf(response, "Command %s not found", msg -> command);
     }
 
     return response;
@@ -69,8 +69,8 @@ char* process_request(struct message *msg, char *response) {
 
 
 int main(void) {
-    pid_t pids[MAX_CONNECTIONS];
-    int rvals[MAX_CONNECTIONS];
+    pid_t pids[MAX_TIMES_OF_CONNECTIONS];
+    int rvals[MAX_TIMES_OF_CONNECTIONS];
     int count;
   int sockfd, clientfd;
   char msg[BUFSIZE];
@@ -86,21 +86,19 @@ int main(void) {
       } else {
           printf("accepted connection from client %d\n", clientfd);
       }
-      sleep(2);
-      for (int i = 0; i < MAX_CONNECTIONS; i++) {
+      sleep(1);
+      for (int i = 0; i < MAX_TIMES_OF_CONNECTIONS; i++) {
           waitpid(pids[i], &rvals[count], WNOHANG);
           printf("Testing %d: %d\n", i, WEXITSTATUS(rvals[i]));
           if (WEXITSTATUS(rvals[i]) == 3) {
               printf("Shutdown signal received.\n");
+              signal(SIGQUIT, SIG_IGN);
+              kill(-(getpid()), SIGQUIT); // kill all the child processes
               exit(0);
           }
       }
       count++;
       printf("accepted connection from client %d\n", clientfd);
-//      if (WEXITSTATUS(rval) == 3) {
-//          printf("Shutdown signal received.");
-//          exit(0);
-//      }
       pids[count] = fork(); // return 0 if in the child process, >0 if it's the parent process, parent will go on to else
       if(pids[count] == 0) { // in the child process
           close(sockfd);
@@ -115,11 +113,9 @@ int main(void) {
               struct message *parsed_msg = (struct message *) msg;
               printf("Command: %s", parsed_msg->command);
               if (strcmp(parsed_msg->command, "shutdown\n")!=0) {
-                  printf("it's not shutdown, moving on... \n");
                   process_request(parsed_msg, response);
                   send_message(clientfd, response, sizeof(response));
               } else {
-                  printf("it is a shutdown!!!");
                   sprintf(response, "shutting down...");
                   send_message(clientfd, response, sizeof(response));
                   puts("child exited");
@@ -127,7 +123,6 @@ int main(void) {
               }
           }
       } else {
-              sleep(1);
               waitpid(pids[count], &rvals[count], WNOHANG);
               printf("parent pid = %d\n",pids[count]);
               count++;

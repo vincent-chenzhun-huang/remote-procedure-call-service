@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 
 #include "a1_lib.h"
 #include "message.h"
@@ -23,9 +21,7 @@ int main(void) {
         struct message parsed_msg = {0};
 
         printf("Enter commands: ");
-        // read user input from command line
         fgets(user_input, BUFSIZE, stdin);
-//    sscanf(user_input, "%s %d %d", parsed_msg->command, &(parsed_msg->arg1), &(parsed_msg->arg2));
         char *token = strtok(user_input, " ");
         int count = 0;
         while (token != NULL) {
@@ -38,6 +34,10 @@ int main(void) {
             }
             count += 1;
             token = strtok(NULL, " ");
+        }
+
+        if(strcmp(parsed_msg.command, "exit\n") == 0) {
+            break;
         }
 
         // send the input to server
